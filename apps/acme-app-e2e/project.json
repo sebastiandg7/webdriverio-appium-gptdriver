@@ -1,0 +1,52 @@
+{
+  "name": "acme-app-e2e",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["acme-app"],
+  "targets": {
+    "e2e-android": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["acme-app:post-build-android"],
+      "outputs": [
+        "{workspaceRoot}/dist/{e2eProjectRoot}",
+        "{workspaceRoot}/coverage/{e2eProjectRoot}"
+      ],
+      "defaultConfiguration": "local",
+      "options": {
+        "command": "wdio run {args.wdioConf}"
+      },
+      "configurations": {
+        "local": {
+          "args": ["--wdioConf=./apps/acme-app-e2e/wdio.android.local.conf.ts"]
+        },
+        "ci": {
+          "args": ["--wdioConf=./apps/acme-app-e2e/wdio.android.ci.conf.ts"]
+        }
+      }
+    },
+    "e2e-ios": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["acme-app:post-build-ios"],
+      "outputs": [
+        "{workspaceRoot}/dist/{e2eProjectRoot}",
+        "{workspaceRoot}/coverage/{e2eProjectRoot}"
+      ],
+      "defaultConfiguration": "local",
+      "options": {
+        "command": "wdio run {args.wdioConf}",
+        "args": ["--wdioConf=./apps/acme-app-e2e/wdio.ios.local.conf.ts"]
+      },
+      "configurations": {
+        "local": {
+          "args": ["--wdioConf=./apps/acme-app-e2e/wdio.ios.local.conf.ts"]
+        },
+        "ci": {
+          "args": ["--wdioConf=./apps/acme-app-e2e/wdio.ios.ci.conf.ts"]
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

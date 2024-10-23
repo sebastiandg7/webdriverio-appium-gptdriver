@@ -1,0 +1,81 @@
+{
+  "name": "acme-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/acme-app/src",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project acme-app --web",
+  "targets": {
+    "build-android": {
+      "dependsOn": ["sync-deps"],
+      "defaultConfiguration": "production",
+      "configurations": {
+        "development": {
+          "mode": "debug"
+        },
+        "production": {
+          "tasks": "clean,assembleRelease,bundleRelease"
+        }
+      }
+    },
+    "post-build-android": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-android"],
+      "inputs": ["{projectRoot}/android/app/build/outputs"],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/android}"],
+      "options": {
+        "commands": [
+          "rm -rf dist/{projectRoot}/android",
+          "mkdir -p dist/{projectRoot}/android",
+          "cp -r {projectRoot}/android/app/build/outputs/apk dist/{projectRoot}/android/",
+          "cp -r {projectRoot}/android/app/build/outputs/bundle dist/{projectRoot}/android/"
+        ],
+        "parallel": false
+      }
+    },
+    "build-ios": {
+      "dependsOn": ["sync-deps", "pod-install"],
+      "defaultConfiguration": "production",
+      "configurations": {
+        "development": {
+          "mode": "Debug"
+        },
+        "production": {
+          "mode": "Release"
+        }
+      }
+    },
+    "post-build-ios": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-ios"],
+      "inputs": ["{projectRoot}/ios/build/Build/Products"],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/ios"],
+      "options": {
+        "commands": [
+          "rm -rf dist/{projectRoot}/ios",
+          "mkdir -p dist/{projectRoot}/ios/{release-iphoneos,debug-iphonesimulator}",
+          "cp -r {projectRoot}/ios/build/Build/Products/Release-iphoneos/AcmeApp.app dist/{projectRoot}/ios/release-iphoneos/",
+          "ditto -ck --sequesterRsrc --keepParent {projectRoot}/ios/build/Build/Products/Release-iphoneos/AcmeApp.app ./dist/{projectRoot}/ios/AcmeApp-release-iphoneos.zip",
+          "cp -r {projectRoot}/ios/build/Build/Products/Release-iphonesimulator/AcmeApp.app dist/{projectRoot}/ios/debug-iphonesimulator/",
+          "ditto -ck --sequesterRsrc --keepParent {projectRoot}/ios/build/Build/Products/Release-iphonesimulator/AcmeApp.app ./dist/{projectRoot}/ios/AcmeApp-release-iphonesimulator.zip"
+        ],
+        "parallel": false
+      }
+    },
+    "bundle-install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bundle install",
+        "cwd": "apps/acme-app/ios"
+      }
+    },
+    "pod-install": {
+      "executor": "@nx/react-native:pod-install",
+      "dependsOn": ["sync-deps", "ensure-symlink"],
+      "outputs": ["{projectRoot}/ios/Pods", "{projectRoot}/ios/Podfile.lock"],
+      "options": {
+        "useBundler": true
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/out-tsc",
+    "module": "commonjs",
+    "types": [
+      "node",
+      "@types/mocha",
+      "@wdio/types",
+      "@wdio/globals/types",
+      "expect-webdriverio",
+      "@wdio/mocha-framework"
+    ]
+  },
+  "include": ["wdio.**.conf.ts", "src/**/*.ts"],
+  "exclude": ["src/wdio-gptdriver-service/**/*.ts"]
+}
